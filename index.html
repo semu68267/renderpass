@@ -20,21 +20,19 @@
   .grid{display:grid; gap:16px; grid-template-columns:repeat(12,1fr); margin-top:28px}
   .card{
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:18px; position:relative; overflow:hidden;
+    border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:18px;
   }
-  /* ✅ 누락되었던 span-6 추가 */
   .span-4{grid-column:span 4}
-  .span-6{grid-column:span 6} /* ← 추가 */
+  .span-6{grid-column:span 6}
   .span-8{grid-column:span 8}
   .span-12{grid-column:span 12}
-  /* ✅ 반응형에서도 span-6 포함 */
   @media (max-width:920px){ .span-8,.span-6,.span-4{grid-column:span 12} }
 
   .label{display:block; font-size:13px; color:var(--muted); margin-bottom:8px}
   .seg{display:flex; gap:10px; flex-wrap:wrap}
 
-  /* 체크박스(유형) */
-  .pill-check{position:relative; display:flex; align-items:center; gap:6px;} /* ← 라벨+수량 가로 정렬 */
+  /* 유형 체크박스 + 장수 */
+  .pill-check{display:flex; align-items:center; gap:8px}
   .pill-check input{display:none}
   .pill-check label{
     display:inline-flex; align-items:center; gap:10px;
@@ -47,13 +45,21 @@
     color:#020617; border-color:transparent; font-weight:700;
   }
   .qty{
-    width:84px; display:inline-flex; align-items:center; justify-content:space-between;
+    width:96px; display:inline-flex; align-items:center; justify-content:space-between;
     background:#0b1220; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:6px 8px;
   }
-  .qty input{width:38px; background:transparent; border:none; color:var(--fg); text-align:center; font-size:14px}
   .qty button{
-    width:22px; height:22px; border-radius:6px; background:#0f1624; color:#cbd5e1; border:1px solid rgba(255,255,255,.08); cursor:pointer
+    width:24px; height:24px; border-radius:6px; background:#0f1624; color:#cbd5e1;
+    border:1px solid rgba(255,255,255,.08); cursor:pointer; font-weight:800;
   }
+  .qty input{
+    width:44px; background:transparent; border:none; text-align:center; font-size:16px; font-weight:800;
+    color:var(--fg); -webkit-text-fill-color:var(--fg); caret-color:var(--fg);
+  }
+  /* iOS/Safari 숫자 스핀 제거 */
+  input[type=number]{ -moz-appearance:textfield; }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
   .qty[hidden]{display:none!important}
 
   /* 라디오(퀄리티/자료) */
@@ -82,9 +88,17 @@
   .cta:hover{transform:translateY(-1px)}
   .fine{font-size:12px; color:var(--muted)}
   .big{font-size:18px; margin:6px 0 2px}
-  .hr{height:1px; background:rgba(255,255,255,.08); margin:18px 0}
+
+  /* 요약 큰 카드 */
+  .summary-list{display:grid; gap:10px}
+  .summary-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:14px 16px; border-radius:12px;
+    background:#0f1624; border:1px solid rgba(255,255,255,.08);
+    font-size:18px; font-weight:800;
+  }
+  .summary-item .muted{font-weight:600; color:#9fb5d9}
   footer{margin-top:24px; color:var(--muted); font-size:12px}
-  ul.clean{margin:0; padding-left:18px}
 </style>
 </head>
 <body>
@@ -92,7 +106,7 @@
     <header>
       <div style="font-size:12px; letter-spacing:.2em; color:#60a5fa; text-transform:uppercase">INSTANT QUOTE</div>
       <h1>렌더링 빠른 견적</h1>
-      <p>다중 유형 + 장수 선택을 지원. 단위는 <strong>만원</strong>임.</p>
+      <p>옵션을 선택하면 실시간으로 계산됩니다. (단위: 만원)</p>
     </header>
 
     <section class="grid">
@@ -141,7 +155,6 @@
             </div>
           </div>
         </div>
-        <div class="fine" style="margin-top:6px">추가 장수는 <strong>기본가의 50%</strong>씩 누적하여 합산함.</div>
       </div>
 
       <!-- 퀄리티 -->
@@ -173,31 +186,17 @@
       <!-- 합계 -->
       <div class="span-12">
         <div class="total">
-          <div>
-            <div class="big">예상 견적</div>
-            <div class="fine">각 유형의 장수 규칙(추가 0.5배) 적용 · 부가세 별도</div>
-          </div>
+          <div class="big" style="margin:0">예상 견적</div>
           <div class="price" id="price">- 만원</div>
           <button class="cta" id="ctaBtn">견적 문의하기</button>
         </div>
       </div>
 
-      <!-- 요약 -->
-      <div class="card span-8">
-        <div class="big">선택 요약</div>
-        <div id="summary" class="fine">옵션을 선택하면 요약이 표시됨.</div>
-        <div class="hr"></div>
-        <ul id="breakdown" class="clean fine"></ul>
-      </div>
-
-      <!-- 참고 -->
-      <div class="card span-4">
-        <div class="big">참고사항</div>
-        <ul class="clean fine">
-          <li>복잡한 파사드, 광활한 부지, 야경 등은 추가가 발생할 수 있음.</li>
-          <li>컷 수가 늘면 묶음 할인 별도 협의 가능.</li>
-          <li>VR/파노라마, 동영상, 드론 합성 등은 별도 문의.</li>
-        </ul>
+      <!-- 큰 선택 요약 -->
+      <div class="card span-12">
+        <div class="label">선택 요약</div>
+        <div id="summaryShort" class="big" style="margin:0 0 10px 0; font-weight:700"></div>
+        <div id="breakdown" class="summary-list"></div>
       </div>
     </section>
 
@@ -220,15 +219,18 @@ const PRETTY = {
 const els = {
   types: document.querySelector('#types'),
   price: document.querySelector('#price'),
-  summary: document.querySelector('#summary'),
+  summaryShort: document.querySelector('#summaryShort'),
   breakdown: document.querySelector('#breakdown'),
   cta: document.querySelector('#ctaBtn')
 };
 function getSelectedQuality(){ return document.querySelector('[name="quality"]:checked').value; }
 function getSelectedAssets(){ return document.querySelector('[name="assets"]:checked').value; }
-function formatKR(n){ return n.toLocaleString('ko-KR'); }
-/* n장의 가격: P + 0.5P*(n-1) */
+/* 0.5배 누적 계산: n장 = P + 0.5P*(n-1) */
 function priceWithQuantity(base, n){ n=Math.max(1,parseInt(n||1,10)); return base + 0.5*base*(n-1); }
+function formatKR(n){
+  const hasPoint = Math.abs(n % 1) > 0;
+  return hasPoint ? n.toLocaleString('ko-KR',{maximumFractionDigits:1}) : n.toLocaleString('ko-KR');
+}
 function getSelectedTypes(){
   const selected=[]; els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
     const type=cb.dataset.type; const qtyInput=document.querySelector(`input[data-qty="${type}"]`);
@@ -239,43 +241,78 @@ function getSelectedTypes(){
 function calc(){
   const q=getSelectedQuality(), a=getSelectedAssets(), selected=getSelectedTypes();
   let total=0; els.breakdown.innerHTML='';
+
+  // 상단 한 줄 요약 (크게)
+  const oneLine = selected.map(s=>`${PRETTY.type[s.type]} ${s.qty}장`).join(' · ');
+  els.summaryShort.textContent = `${oneLine} · ${PRETTY.quality[q]} · ${PRETTY.assets[a]}`;
+
+  // 상세 라인들
   selected.forEach(({type,qty})=>{
-    const base=PRICE_TABLE[type][q][a]; const subtotal=priceWithQuantity(base,qty); total+=subtotal;
-    const li=document.createElement('li'); li.innerHTML=`<strong>${PRETTY.type[type]}</strong> · ${qty}장 · 기본가 ${base} → 합계 ${formatKR(subtotal)} 만원`;
-    els.breakdown.appendChild(li);
+    const base=PRICE_TABLE[type][q][a];
+    const subtotal=priceWithQuantity(base,qty); total+=subtotal;
+
+    const item=document.createElement('div');
+    item.className='summary-item';
+    item.innerHTML = `
+      <span>${PRETTY.type[type]} <span class="muted">·</span> ${qty}장 <span class="muted">·</span> 기본가 ${formatKR(base)}</span>
+      <span>→ 합계 <strong>${formatKR(subtotal)} 만원</strong></span>`;
+    els.breakdown.appendChild(item);
   });
-  els.price.textContent=`${formatKR(total)} 만원`;
-  const list=selected.map(s=>`${PRETTY.type[s.type]} ${s.qty}장`).join(', ');
-  els.summary.innerHTML = `${list} · <strong>${PRETTY.quality[q]}</strong> · <strong>${PRETTY.assets[a]}</strong>`;
+
+  els.price.textContent = `${formatKR(total)} 만원`;
 }
 function bindQtyUI(){
-  els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
-    const type=cb.dataset.type; const box=document.querySelector(`#qty-${type}`);
+  // 체크박스 토글 시 장수 입력 show/hide
+  document.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
+    const type=cb.dataset.type; const box=document.getElementById(`qty-${type}`);
     function toggle(){ box.hidden=!cb.checked; calc(); }
     cb.addEventListener('change', toggle); toggle();
   });
-  els.types.querySelectorAll('.qty button').forEach(btn=>{
+  // + / - 버튼
+  document.querySelectorAll('.qty button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const type=btn.dataset.plus||btn.dataset.minus; const input=document.querySelector(`input[data-qty="${type}"]`);
-      let v=parseInt(input.value||"1",10); if(btn.dataset.plus) v++; if(btn.dataset.minus) v=Math.max(1,v-1); input.value=v; calc();
+      const type=btn.dataset.plus||btn.dataset.minus;
+      const input=document.querySelector(`input[data-qty="${type}"]`);
+      let v=parseInt(input.value||"1",10);
+      if(btn.dataset.plus) v++; else v=Math.max(1,v-1);
+      input.value=v; calc();
     });
   });
-  els.types.querySelectorAll('.qty input[type="number"]').forEach(inp=>{
+  // 직접 입력
+  document.querySelectorAll('.qty input[type="number"]').forEach(inp=>{
     inp.addEventListener('input', ()=>{ if(inp.value===''||parseInt(inp.value,10)<1) inp.value=1; calc(); });
     inp.addEventListener('blur', ()=>{ if(parseInt(inp.value,10)<1) inp.value=1; calc(); });
   });
 }
 ['quality','assets'].forEach(id=>{ document.querySelectorAll(`#${id} input`).forEach(i=> i.addEventListener('change', calc)); });
-async function copyText(txt){ try{ await navigator.clipboard.writeText(txt); return true; }catch(e){ const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-1000px'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} document.body.removeChild(ta); return ok; } }
-function selectedMessage(total){ const q=PRETTY.quality[getSelectedQuality()], a=PRETTY.assets[getSelectedAssets()], typesText=getSelectedTypes().map(({type,qty})=>`${PRETTY.type[type]} ${qty}장`).join(', '); return `[빠른 견적 문의]
-유형: ${typesText}
+
+async function copyText(txt){
+  try{ await navigator.clipboard.writeText(txt); return true; }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly','');
+    ta.style.position='fixed'; ta.style.top='-1000px'; document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} document.body.removeChild(ta); return ok; }
+}
+function messageForCopy(total){
+  const q=PRETTY.quality[getSelectedQuality()], a=PRETTY.assets[getSelectedAssets()];
+  const t=getSelectedTypes().map(({type,qty})=>`${PRETTY.type[type]} ${qty}장`).join(', ');
+  return `[빠른 견적 문의]
+유형: ${t}
 레벨: ${q}
 자료: ${a}
 예상가: ${total}만원
 
-프로젝트 개요(용도/면적/요청컷/데드라인)를 보내주세요 :)`; }
-els.cta.addEventListener('click', async ()=>{ const totalStr=document.getElementById('price').textContent.replace(' 만원','').replace(/,/g,''); const total=parseInt(totalStr,10); const ok=await copyText(selectedMessage(total)); els.cta.textContent= ok? "복사됨! 메신저에 붙여넣기":"복사 실패… 길게 눌러 복사"; setTimeout(()=> els.cta.textContent="견적 문의하기",1800); });
-bindQtyUI(); calc();
+프로젝트 개요(용도/면적/컷/데드라인)를 보내주세요 :)`;
+}
+document.getElementById('ctaBtn').addEventListener('click', async ()=>{
+  const totalNum = Number(document.getElementById('price').textContent.replace(' 만원','').replace(/,/g,''));
+  const ok = await copyText(messageForCopy(totalNum));
+  const btn = document.getElementById('ctaBtn');
+  btn.textContent = ok ? "복사됨! 메신저에 붙여넣기" : "복사 실패… 길게 눌러 복사";
+  setTimeout(()=> btn.textContent="견적 문의하기", 1800);
+});
+
+bindQtyUI();
+calc();
 </script>
 </body>
 </html>
