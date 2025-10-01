@@ -6,7 +6,7 @@
 <title>빠른 견적 | 01project</title>
 <style>
   :root{
-    --bg:#0b0f15; --card:#121826; --fg:#e6edf7; --muted:#9aa4b2;
+    --bg:#0b0f15; --card:#121826; --fg:#eaf2ff; --muted:#9aa4b2;
     --accent:#3b82f6; --accent-2:#60a5fa; --ring: rgba(59,130,246,.45);
   }
   *{box-sizing:border-box}
@@ -37,7 +37,7 @@
   .pill-check label{
     display:inline-flex; align-items:center; gap:10px;
     cursor:pointer; user-select:none; padding:10px 12px; border-radius:10px;
-    border:1px solid rgba(255,255,255,.08); background:#0f1624; color:#cbd5e1; font-size:14px;
+    border:1px solid rgba(255,255,255,.08); background:#0f1624; color:#dbe8ff; font-size:14px;
     transition:all .18s ease;
   }
   .pill-check input:checked + label{
@@ -45,16 +45,16 @@
     color:#020617; border-color:transparent; font-weight:700;
   }
   .qty{
-    width:96px; display:inline-flex; align-items:center; justify-content:space-between;
-    background:#0b1220; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:6px 8px;
+    width:100px; display:inline-flex; align-items:center; justify-content:space-between;
+    background:#0b1220; border:1px solid rgba(255,255,255,.14); border-radius:10px; padding:6px 8px;
   }
   .qty button{
-    width:24px; height:24px; border-radius:6px; background:#0f1624; color:#cbd5e1;
-    border:1px solid rgba(255,255,255,.08); cursor:pointer; font-weight:800;
+    width:26px; height:26px; border-radius:6px; background:#0f1624; color:#cbd5e1;
+    border:1px solid rgba(255,255,255,.12); cursor:pointer; font-weight:800;
   }
   .qty input{
-    width:44px; background:transparent; border:none; text-align:center; font-size:16px; font-weight:800;
-    color:var(--fg); -webkit-text-fill-color:var(--fg); caret-color:var(--fg);
+    width:44px; background:transparent; border:none; text-align:center;
+    font-size:16px; font-weight:900; color:#fff !important; -webkit-text-fill-color:#fff !important; caret-color:#fff;
   }
   /* iOS/Safari 숫자 스핀 제거 */
   input[type=number]{ -moz-appearance:textfield; }
@@ -62,7 +62,7 @@
   input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
   .qty[hidden]{display:none!important}
 
-  /* 라디오(퀄리티/자료) */
+  /* 라디오(퀄리티) */
   .seg input[type=radio]{display:none}
   .seg .radio{
     user-select:none; cursor:pointer; padding:10px 12px; border-radius:10px;
@@ -86,7 +86,6 @@
     box-shadow:0 10px 30px rgba(59,130,246,.35); transition:transform .12s ease;
   }
   .cta:hover{transform:translateY(-1px)}
-  .fine{font-size:12px; color:var(--muted)}
   .big{font-size:18px; margin:6px 0 2px}
 
   /* 요약 큰 카드 */
@@ -98,7 +97,16 @@
     font-size:18px; font-weight:800;
   }
   .summary-item .muted{font-weight:600; color:#9fb5d9}
-  footer{margin-top:24px; color:var(--muted); font-size:12px}
+
+  /* 모달 */
+  .modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:1000}
+  .modal.active{display:flex}
+  .sheet{width:min(480px,92vw); background:var(--card); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:18px}
+  .sheet h3{margin:0 0 10px 0}
+  .row-end{display:flex; gap:10px; justify-content:flex-end; margin-top:14px}
+  .btn{padding:10px 12px; border-radius:10px; background:#0f1624; color:#cbd5e1; border:1px solid rgba(255,255,255,.12); cursor:pointer}
+  .btn.primary{background:linear-gradient(180deg, var(--accent), var(--accent-2)); color:#071019; border:none; font-weight:800}
+  .seg.modal-seg label{margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -112,7 +120,7 @@
     <section class="grid">
       <!-- 유형 (복수 선택 + 각 유형별 장수) -->
       <div class="card span-12">
-        <div class="label">프로젝트 유형(복수 선택 가능) · 각 유형별 장수</div>
+        <div class="label">프로젝트 유형(복수 선택) · 각 유형별 장수</div>
         <div class="seg" id="types">
           <!-- 실내 -->
           <div class="pill-check">
@@ -170,16 +178,12 @@
         </div>
       </div>
 
-      <!-- 자료 제공 -->
+      <!-- 자료 제공: 팝업 트리거 -->
       <div class="card span-6">
-        <div class="label">자료 제공</div>
-        <div class="seg" id="assets">
-          <input type="radio" name="assets" id="a-both" value="both" checked>
-          <label class="radio" for="a-both">도면·모델 모두 제공</label>
-          <input type="radio" name="assets" id="a-model" value="modelOnly">
-          <label class="radio" for="a-model">3D 모델만 제공(도X·모O)</label>
-          <input type="radio" name="assets" id="a-none" value="none">
-          <label class="radio" for="a-none">자료 없음(도X·모X)</label>
+        <div class="label">자료 제공 세부 설정</div>
+        <div class="seg">
+          <button class="btn" id="btnDrawing">도면 유형: <span id="labelDrawing">DWG</span></button>
+          <button class="btn" id="btnModeling">모델링 유형: <span id="labelModeling">외장재까지</span></button>
         </div>
       </div>
 
@@ -203,34 +207,88 @@
     <footer>© 01project · “0에서 1로, 상상을 현실로 공간과 브랜드를 디자인합니다.” 임</footer>
   </div>
 
+  <!-- 도면 유형 모달 -->
+  <div class="modal" id="modalDrawing" aria-hidden="true">
+    <div class="sheet">
+      <h3>도면 유형 선택</h3>
+      <div class="seg modal-seg" id="drawingOptions">
+        <input type="radio" name="drawing" id="draw-none" value="none">
+        <label class="radio" for="draw-none">없음 (×1.2)</label>
+        <input type="radio" name="drawing" id="draw-photo" value="photo">
+        <label class="radio" for="draw-photo">사진 (×1.1)</label>
+        <input type="radio" name="drawing" id="draw-dwg" value="dwg" checked>
+        <label class="radio" for="draw-dwg">DWG (×1.0)</label>
+      </div>
+      <div class="row-end">
+        <button class="btn" data-close="modalDrawing">취소</button>
+        <button class="btn primary" id="saveDrawing">선택</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모델링 유형 모달 -->
+  <div class="modal" id="modalModeling" aria-hidden="true">
+    <div class="sheet">
+      <h3>모델링 유형 선택</h3>
+      <div class="seg modal-seg" id="modelingOptions">
+        <input type="radio" name="modeling" id="mod-mass" value="mass">
+        <label class="radio" for="mod-mass">매스 (×1.2)</label>
+        <input type="radio" name="modeling" id="mod-low" value="lowdetail">
+        <label class="radio" for="mod-low">디자인 적음 (×1.1)</label>
+        <input type="radio" name="modeling" id="mod-full" value="full" checked>
+        <label class="radio" for="mod-full">외장재까지 (×1.0)</label>
+      </div>
+      <div class="row-end">
+        <button class="btn" data-close="modalModeling">취소</button>
+        <button class="btn primary" id="saveModeling">선택</button>
+      </div>
+    </div>
+  </div>
+
 <script>
-/* 가격표 (만원) — interior.high.none = 70 유지 */
+/* ====== 기본 단가표(만원) — assets 열은 내부 유지(베이스는 both를 사용) ====== */
 const PRICE_TABLE = {
   interior: { low:{both:10,modelOnly:15,none:20}, mid:{both:20,modelOnly:30,none:40}, high:{both:30,modelOnly:50,none:70} },
   exterior: { low:{both:20,modelOnly:25,none:30}, mid:{both:30,modelOnly:40,none:50}, high:{both:50,modelOnly:75,none:100} },
   bird:     { low:{both:30,modelOnly:50,none:75}, mid:{both:60,modelOnly:80,none:100}, high:{both:100,modelOnly:150,none:200} },
   area:     { low:{both:60,modelOnly:80,none:100}, mid:{both:100,modelOnly:150,none:200}, high:{both:150,modelOnly:200,none:300} }
 };
+/* ====== 팝업 선택 배수(요청사항): 1.2 / 1.1 / 1.0 ====== */
+const DRAW_MULTI = { none:1.2, photo:1.1, dwg:1.0 };
+const MODEL_MULTI = { mass:1.2, lowdetail:1.1, full:1.0 };
+
 const PRETTY = {
   type:{ interior:"실내 투시", exterior:"실외 투시", bird:"조감", area:"광역" },
   quality:{ low:"베이식", mid:"프로", high:"엘리트" },
-  assets:{ both:"도면·모델 모두 제공", modelOnly:"3D 모델만 제공", none:"자료 없음" }
+  drawing:{ none:"없음", photo:"사진", dwg:"DWG" },
+  modeling:{ mass:"매스", lowdetail:"디자인 적음", full:"외장재까지" }
 };
+
+let drawingSel = 'dwg';      // 기본: DWG(×1.0)
+let modelingSel = 'full';    // 기본: 외장재까지(×1.0)
+
 const els = {
   types: document.querySelector('#types'),
   price: document.querySelector('#price'),
   summaryShort: document.querySelector('#summaryShort'),
   breakdown: document.querySelector('#breakdown'),
-  cta: document.querySelector('#ctaBtn')
+  cta: document.querySelector('#ctaBtn'),
+  // modal bits
+  modalDrawing: document.getElementById('modalDrawing'),
+  modalModeling: document.getElementById('modalModeling'),
+  btnDrawing: document.getElementById('btnDrawing'),
+  btnModeling: document.getElementById('btnModeling'),
+  labelDrawing: document.getElementById('labelDrawing'),
+  labelModeling: document.getElementById('labelModeling'),
 };
+
 function getSelectedQuality(){ return document.querySelector('[name="quality"]:checked').value; }
-function getSelectedAssets(){ return document.querySelector('[name="assets"]:checked').value; }
-/* 0.5배 누적 계산: n장 = P + 0.5P*(n-1) */
-function priceWithQuantity(base, n){ n=Math.max(1,parseInt(n||1,10)); return base + 0.5*base*(n-1); }
 function formatKR(n){
   const hasPoint = Math.abs(n % 1) > 0;
   return hasPoint ? n.toLocaleString('ko-KR',{maximumFractionDigits:1}) : n.toLocaleString('ko-KR');
 }
+/* 0.5배 누적: n장 = P + 0.5P*(n-1) */
+function priceWithQuantity(base, n){ n=Math.max(1,parseInt(n||1,10)); return base + 0.5*base*(n-1); }
 function getSelectedTypes(){
   const selected=[]; els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
     const type=cb.dataset.type; const qtyInput=document.querySelector(`input[data-qty="${type}"]`);
@@ -238,37 +296,43 @@ function getSelectedTypes(){
   });
   return selected.length?selected:[{type:'interior',qty:1}];
 }
+
 function calc(){
-  const q=getSelectedQuality(), a=getSelectedAssets(), selected=getSelectedTypes();
+  const q=getSelectedQuality();
+  const selected=getSelectedTypes();
+  const drawMul = DRAW_MULTI[drawingSel];
+  const modelMul = MODEL_MULTI[modelingSel];
+
   let total=0; els.breakdown.innerHTML='';
 
-  // 상단 한 줄 요약 (크게)
   const oneLine = selected.map(s=>`${PRETTY.type[s.type]} ${s.qty}장`).join(' · ');
-  els.summaryShort.textContent = `${oneLine} · ${PRETTY.quality[q]} · ${PRETTY.assets[a]}`;
+  els.summaryShort.textContent = `${oneLine} · ${PRETTY.quality[q]} · 도면:${PRETTY.drawing[drawingSel]} ×${drawMul} · 모델:${PRETTY.modeling[modelingSel]} ×${modelMul}`;
 
-  // 상세 라인들
   selected.forEach(({type,qty})=>{
-    const base=PRICE_TABLE[type][q][a];
-    const subtotal=priceWithQuantity(base,qty); total+=subtotal;
+    // 베이스는 both(도면·모델 제공 기준)를 사용
+    const base = PRICE_TABLE[type][q].both;
+    const adjusted = base * drawMul * modelMul;
+    const subtotal = priceWithQuantity(adjusted, qty);
+    total += subtotal;
 
     const item=document.createElement('div');
     item.className='summary-item';
     item.innerHTML = `
-      <span>${PRETTY.type[type]} <span class="muted">·</span> ${qty}장 <span class="muted">·</span> 기본가 ${formatKR(base)}</span>
+      <span>${PRETTY.type[type]} <span class="muted">·</span> ${qty}장 <span class="muted">·</span> 기본가 ${formatKR(base)} ×${drawMul} ×${modelMul}</span>
       <span>→ 합계 <strong>${formatKR(subtotal)} 만원</strong></span>`;
     els.breakdown.appendChild(item);
   });
 
   els.price.textContent = `${formatKR(total)} 만원`;
 }
+
+/* 수량/체크박스 바인딩 */
 function bindQtyUI(){
-  // 체크박스 토글 시 장수 입력 show/hide
   document.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
     const type=cb.dataset.type; const box=document.getElementById(`qty-${type}`);
     function toggle(){ box.hidden=!cb.checked; calc(); }
     cb.addEventListener('change', toggle); toggle();
   });
-  // + / - 버튼
   document.querySelectorAll('.qty button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const type=btn.dataset.plus||btn.dataset.minus;
@@ -278,14 +342,40 @@ function bindQtyUI(){
       input.value=v; calc();
     });
   });
-  // 직접 입력
   document.querySelectorAll('.qty input[type="number"]').forEach(inp=>{
     inp.addEventListener('input', ()=>{ if(inp.value===''||parseInt(inp.value,10)<1) inp.value=1; calc(); });
     inp.addEventListener('blur', ()=>{ if(parseInt(inp.value,10)<1) inp.value=1; calc(); });
   });
 }
-['quality','assets'].forEach(id=>{ document.querySelectorAll(`#${id} input`).forEach(i=> i.addEventListener('change', calc)); });
+document.querySelectorAll('#quality input').forEach(i=> i.addEventListener('change', calc));
 
+/* 모달 공통 */
+function openModal(el){ el.classList.add('active'); }
+function closeModal(el){ el.classList.remove('active'); }
+
+/* 도면 모달 */
+els.btnDrawing.addEventListener('click', ()=> openModal(els.modalDrawing));
+document.getElementById('saveDrawing').addEventListener('click', ()=>{
+  const val = document.querySelector('input[name="drawing"]:checked').value;
+  drawingSel = val;
+  els.labelDrawing.textContent = PRETTY.drawing[val];
+  closeModal(els.modalDrawing);
+  calc();
+});
+document.querySelectorAll('[data-close="modalDrawing"]').forEach(b=> b.addEventListener('click', ()=> closeModal(els.modalDrawing)));
+
+/* 모델링 모달 */
+els.btnModeling.addEventListener('click', ()=> openModal(els.modalModeling));
+document.getElementById('saveModeling').addEventListener('click', ()=>{
+  const val = document.querySelector('input[name="modeling"]:checked').value;
+  modelingSel = val;
+  els.labelModeling.textContent = PRETTY.modeling[val];
+  closeModal(els.modalModeling);
+  calc();
+});
+document.querySelectorAll('[data-close="modalModeling"]').forEach(b=> b.addEventListener('click', ()=> closeModal(els.modalModeling)));
+
+/* 복사 기능 */
 async function copyText(txt){
   try{ await navigator.clipboard.writeText(txt); return true; }
   catch(e){ const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly','');
@@ -293,12 +383,13 @@ async function copyText(txt){
     let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} document.body.removeChild(ta); return ok; }
 }
 function messageForCopy(total){
-  const q=PRETTY.quality[getSelectedQuality()], a=PRETTY.assets[getSelectedAssets()];
+  const q=PRETTY.quality[getSelectedQuality()];
   const t=getSelectedTypes().map(({type,qty})=>`${PRETTY.type[type]} ${qty}장`).join(', ');
   return `[빠른 견적 문의]
 유형: ${t}
 레벨: ${q}
-자료: ${a}
+도면: ${PRETTY.drawing[drawingSel]}(×${DRAW_MULTI[drawingSel]})
+모델링: ${PRETTY.modeling[modelingSel]}(×${MODEL_MULTI[modelingSel]})
 예상가: ${total}만원
 
 프로젝트 개요(용도/면적/컷/데드라인)를 보내주세요 :)`;
@@ -311,8 +402,8 @@ document.getElementById('ctaBtn').addEventListener('click', async ()=>{
   setTimeout(()=> btn.textContent="견적 문의하기", 1800);
 });
 
-bindQtyUI();
-calc();
+/* init */
+bindQtyUI(); calc();
 </script>
 </body>
 </html>
