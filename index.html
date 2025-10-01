@@ -6,58 +6,59 @@
 <title>빠른 견적 | 01project</title>
 <style>
   :root{
-    --bg:#0b0f15;
-    --card:#121826;
-    --fg:#e6edf7;
-    --muted:#9aa4b2;
-    --accent:#3b82f6;   /* 파란 포인트 */
-    --accent-2:#60a5fa;
-    --ring: rgba(59,130,246,.45);
+    --bg:#0b0f15; --card:#121826; --fg:#e6edf7; --muted:#9aa4b2;
+    --accent:#3b82f6; --accent-2:#60a5fa; --ring: rgba(59,130,246,.45);
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
   body{
     margin:0; background:radial-gradient(1200px 800px at 70% -10%, rgba(59,130,246,.12), transparent 60%), var(--bg);
-    color:var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Apple SD Gothic Neo, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    line-height:1.5;
+    color:var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, "Apple Color Emoji", "Segoe UI Emoji";
   }
-  a{color:inherit}
   .wrap{max-width:1100px; margin:0 auto; padding:32px 20px 56px}
   header h1{margin:0 0 8px; font-size:28px; letter-spacing:-.02em}
   header p{margin:0; color:var(--muted)}
   .grid{display:grid; gap:16px; grid-template-columns:repeat(12,1fr); margin-top:28px}
   .card{
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:16px; padding:18px; position:relative; overflow:hidden;
+    border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:18px; position:relative; overflow:hidden;
   }
-  .card::after{ /* 은은한 블루 글로우 */
-    content:""; position:absolute; inset:-2px; border-radius:16px; pointer-events:none;
-    box-shadow:0 0 0 1px rgba(255,255,255,.02), 0 0 40px 0 var(--ring);
-    opacity:.0;
-    transition:opacity .25s ease;
-  }
-  .card:hover::after{opacity:1}
-  .span-4{grid-column:span 4}
-  .span-8{grid-column:span 8}
-  .span-12{grid-column:span 12}
+  .span-4{grid-column:span 4} .span-8{grid-column:span 8} .span-12{grid-column:span 12}
   @media (max-width:920px){ .span-8,.span-4{grid-column:span 12} }
 
   .label{display:block; font-size:13px; color:var(--muted); margin-bottom:8px}
-  .seg{
-    display:flex; gap:8px; flex-wrap:wrap;
-  }
-  .seg input{display:none}
-  .seg label{
-    user-select:none; cursor:pointer; padding:10px 12px; border-radius:10px;
+  .seg{display:flex; gap:10px; flex-wrap:wrap}
+  /* type: checkbox pill */
+  .pill-check{position:relative}
+  .pill-check input{display:none}
+  .pill-check label{
+    display:inline-flex; align-items:center; gap:10px;
+    cursor:pointer; user-select:none; padding:10px 12px; border-radius:10px;
     border:1px solid rgba(255,255,255,.08); background:#0f1624; color:#cbd5e1; font-size:14px;
     transition:all .18s ease;
   }
-  .seg input:checked + label{
+  .pill-check input:checked + label{
     background:linear-gradient(180deg, var(--accent), var(--accent-2));
     color:#020617; border-color:transparent; font-weight:700;
   }
-  .hint{font-size:12px; color:var(--muted); margin-top:6px}
+  .qty{
+    width:78px; display:inline-flex; align-items:center; justify-content:space-between;
+    background:#0b1220; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:6px 8px; margin-left:6px;
+  }
+  .qty input{width:36px; background:transparent; border:none; color:var(--fg); text-align:center; font-size:14px}
+  .qty button{
+    width:22px; height:22px; border-radius:6px; background:#0f1624; color:#cbd5e1; border:1px solid rgba(255,255,255,.08); cursor:pointer
+  }
+  .qty[hidden]{display:none!important}
+
+  .seg input[type=radio]{display:none}
+  .seg .radio{
+    user-select:none; cursor:pointer; padding:10px 12px; border-radius:10px;
+    border:1px solid rgba(255,255,255,.08); background:#0f1624; color:#cbd5e1; font-size:14px; transition:all .18s ease;
+  }
+  .seg input[type=radio]:checked + .radio{
+    background:linear-gradient(180deg, var(--accent), var(--accent-2));
+    color:#020617; border-color:transparent; font-weight:700;
+  }
 
   .total{
     display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -66,83 +67,100 @@
     border:1px solid rgba(59,130,246,.35);
   }
   .total .price{font-size:40px; font-weight:800; letter-spacing:-.02em}
-  .pill{
-    font-size:12px; color:#0b1220; background:linear-gradient(180deg, var(--accent), var(--accent-2));
-    border-radius:999px; padding:6px 10px; font-weight:700;
-  }
-
   .cta{
     display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px;
     background:linear-gradient(180deg, var(--accent), var(--accent-2)); color:#071019; font-weight:800; border:none; cursor:pointer;
     box-shadow:0 10px 30px rgba(59,130,246,.35); transition:transform .12s ease;
   }
   .cta:hover{transform:translateY(-1px)}
-  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
   .fine{font-size:12px; color:var(--muted)}
-  .hr{height:1px; background:rgba(255,255,255,.08); margin:18px 0}
-  .kicker{font-size:12px; letter-spacing:.2em; color:var(--accent-2); text-transform:uppercase}
   .big{font-size:18px; margin:6px 0 2px}
+  .hr{height:1px; background:rgba(255,255,255,.08); margin:18px 0}
   footer{margin-top:24px; color:var(--muted); font-size:12px}
+  ul.clean{margin:0; padding-left:18px}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="kicker">INSTANT QUOTE</div>
+      <div style="font-size:12px; letter-spacing:.2em; color:#60a5fa; text-transform:uppercase">INSTANT QUOTE</div>
       <h1>렌더링 빠른 견적</h1>
-      <p>선택할 때마다 실시간으로 금액이 계산됩니다. 단위는 <strong>만원</strong>임.</p>
+      <p>다중 유형 + 장수 선택을 지원. 단위는 <strong>만원</strong>임.</p>
     </header>
 
     <section class="grid">
-      <!-- 유형 -->
-      <div class="card span-4">
-        <div class="label">프로젝트 유형</div>
-        <div class="seg" id="type">
-          <input type="radio" name="type" id="t-in" value="interior" checked>
-          <label for="t-in">실내 투시</label>
-
-          <input type="radio" name="type" id="t-out" value="exterior">
-          <label for="t-out">실외 투시</label>
-
-          <input type="radio" name="type" id="t-bird" value="bird">
-          <label for="t-bird">조감</label>
-
-          <input type="radio" name="type" id="t-area" value="area">
-          <label for="t-area">광역</label>
+      <!-- 유형 (복수 선택 + 각 유형별 장수) -->
+      <div class="card span-12">
+        <div class="label">프로젝트 유형(복수 선택 가능) · 각 유형별 장수</div>
+        <div class="seg" id="types">
+          <!-- 실내 -->
+          <div class="pill-check">
+            <input type="checkbox" id="type-interior" data-type="interior" checked>
+            <label for="type-interior">실내 투시</label>
+            <div class="qty" id="qty-interior">
+              <button data-minus="interior">-</button>
+              <input type="number" min="1" step="1" value="1" data-qty="interior" aria-label="실내 장수">
+              <button data-plus="interior">+</button>
+            </div>
+          </div>
+          <!-- 실외 -->
+          <div class="pill-check">
+            <input type="checkbox" id="type-exterior" data-type="exterior">
+            <label for="type-exterior">실외 투시</label>
+            <div class="qty" id="qty-exterior" hidden>
+              <button data-minus="exterior">-</button>
+              <input type="number" min="1" step="1" value="1" data-qty="exterior" aria-label="실외 장수">
+              <button data-plus="exterior">+</button>
+            </div>
+          </div>
+          <!-- 조감 -->
+          <div class="pill-check">
+            <input type="checkbox" id="type-bird" data-type="bird">
+            <label for="type-bird">조감</label>
+            <div class="qty" id="qty-bird" hidden>
+              <button data-minus="bird">-</button>
+              <input type="number" min="1" step="1" value="1" data-qty="bird" aria-label="조감 장수">
+              <button data-plus="bird">+</button>
+            </div>
+          </div>
+          <!-- 광역 -->
+          <div class="pill-check">
+            <input type="checkbox" id="type-area" data-type="area">
+            <label for="type-area">광역</label>
+            <div class="qty" id="qty-area" hidden>
+              <button data-minus="area">-</button>
+              <input type="number" min="1" step="1" value="1" data-qty="area" aria-label="광역 장수">
+              <button data-plus="area">+</button>
+            </div>
+          </div>
         </div>
-        <div class="hint">공간/대지 범위에 따라 기본 난이도가 달라짐.</div>
+        <div class="fine" style="margin-top:6px">추가 장수는 <strong>기본가의 50%</strong>씩 누적하여 합산함.</div>
       </div>
 
       <!-- 퀄리티 -->
-      <div class="card span-4">
+      <div class="card span-6">
         <div class="label">표현 레벨</div>
         <div class="seg" id="quality">
-          <input type="radio" name="quality" id="q-basic" value="low" checked>
-          <label for="q-basic">베이식</label>
-
-          <input type="radio" name="quality" id="q-pro" value="mid">
-          <label for="q-pro">프로</label>
-
-          <input type="radio" name="quality" id="q-elite" value="high">
-          <label for="q-elite">엘리트</label>
+          <input type="radio" name="quality" id="q-low" value="low" checked>
+          <label class="radio" for="q-low">베이식</label>
+          <input type="radio" name="quality" id="q-mid" value="mid">
+          <label class="radio" for="q-mid">프로</label>
+          <input type="radio" name="quality" id="q-high" value="high">
+          <label class="radio" for="q-high">엘리트</label>
         </div>
-        <div class="hint">베이식(저품질) / 프로(고품질) / 엘리트(하이엔드).</div>
       </div>
 
       <!-- 자료 제공 -->
-      <div class="card span-4">
+      <div class="card span-6">
         <div class="label">자료 제공</div>
         <div class="seg" id="assets">
           <input type="radio" name="assets" id="a-both" value="both" checked>
-          <label for="a-both">도면·모델 모두 제공</label>
-
+          <label class="radio" for="a-both">도면·모델 모두 제공</label>
           <input type="radio" name="assets" id="a-model" value="modelOnly">
-          <label for="a-model">3D 모델만 제공</label>
-
+          <label class="radio" for="a-model">3D 모델만 제공(도X·모O)</label>
           <input type="radio" name="assets" id="a-none" value="none">
-          <label for="a-none">자료 없음</label>
+          <label class="radio" for="a-none">자료 없음(도X·모X)</label>
         </div>
-        <div class="hint">가로축: 도O·모O / 도X·모O / 도X·모X 기준으로 가격 매핑됨.</div>
       </div>
 
       <!-- 합계 -->
@@ -150,15 +168,10 @@
         <div class="total">
           <div>
             <div class="big">예상 견적</div>
-            <div class="fine">컷 1장 기준 · 부가세 별도</div>
+            <div class="fine">각 유형의 장수 규칙(추가 0.5배) 적용 · 부가세 별도</div>
           </div>
           <div class="price" id="price">- 만원</div>
-          <button class="cta" id="ctaBtn">
-            견적 문의하기
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 12h14M13 5l7 7-7 7" stroke="#0b1220" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
+          <button class="cta" id="ctaBtn">견적 문의하기</button>
         </div>
       </div>
 
@@ -167,38 +180,34 @@
         <div class="big">선택 요약</div>
         <div id="summary" class="fine">옵션을 선택하면 요약이 표시됨.</div>
         <div class="hr"></div>
-        <div class="row fine">
-          <span class="pill">TIP</span>
-          <span>“자료 없음(도X·모X)”일수록 모델링·리서치 비용이 포함되어 단가가 상승함.</span>
-        </div>
+        <ul id="breakdown" class="clean fine"></ul>
       </div>
 
-      <!-- 참고 & 고지 -->
+      <!-- 참고 -->
       <div class="card span-4">
         <div class="big">참고사항</div>
-        <ul class="fine">
-          <li>도시 야경, 복잡한 파사드, 광활한 부지 등은 추가가 발생할 수 있음.</li>
-          <li>컷 수가 늘면 <strong>묶음 할인</strong> 가능. 시안·수정 라운드 정책 협의.</li>
+        <ul class="clean fine">
+          <li>복잡한 파사드, 광활한 부지, 야경 등은 추가가 발생할 수 있음.</li>
+          <li>컷 수가 늘면 묶음 할인 별도 협의 가능.</li>
           <li>VR/파노라마, 동영상, 드론 합성 등은 별도 문의.</li>
         </ul>
       </div>
     </section>
 
-    <footer>
-      © 01project · “0에서 1로, 상상을 현실로 공간과 브랜드를 디자인합니다.” 임
-    </footer>
+    <footer>© 01project · “0에서 1로, 상상을 현실로 공간과 브랜드를 디자인합니다.” 임</footer>
   </div>
 
 <script>
 /* ===============================
    가격표 (단위: 만원)
-   가로축 해석: both(도O·모O) / modelOnly(도X·모O) / none(도X·모X)
+   열: both(도O·모O) / modelOnly(도X·모O) / none(도X·모X)
+   요청 반영: interior.high.none = 70
    =============================== */
 const PRICE_TABLE = {
   interior: { // 실내투시도
     low:   { both: 10, modelOnly: 15, none: 20 },
     mid:   { both: 20, modelOnly: 30, none: 40 },
-    high:  { both: 30, modelOnly: 50, none: 110 }
+    high:  { both: 30, modelOnly: 50, none: 70 } // ← 수정됨
   },
   exterior: { // 실외투시도
     low:   { both: 20, modelOnly: 25, none: 30 },
@@ -217,60 +226,134 @@ const PRICE_TABLE = {
   }
 };
 
-const pretty = {
-  type:{
-    interior:"실내 투시", exterior:"실외 투시", bird:"조감", area:"광역"
-  },
+const PRETTY = {
+  type:{ interior:"실내 투시", exterior:"실외 투시", bird:"조감", area:"광역" },
   quality:{ low:"베이식", mid:"프로", high:"엘리트" },
   assets:{ both:"도면·모델 모두 제공", modelOnly:"3D 모델만 제공", none:"자료 없음" }
 };
 
 const els = {
-  type: document.querySelector('#type'),
-  quality: document.querySelector('#quality'),
-  assets: document.querySelector('#assets'),
+  types: document.querySelector('#types'),
   price: document.querySelector('#price'),
   summary: document.querySelector('#summary'),
+  breakdown: document.querySelector('#breakdown'),
   cta: document.querySelector('#ctaBtn')
 };
 
-function getSelected(name){
-  return document.querySelector(`[name="${name}"]:checked`)?.value;
-}
-
+function getSelectedQuality(){ return document.querySelector('[name="quality"]:checked').value; }
+function getSelectedAssets(){ return document.querySelector('[name="assets"]:checked').value; }
 function formatKR(n){ return n.toLocaleString('ko-KR'); }
 
-function calc(){
-  const type = getSelected('type');
-  const quality = getSelected('quality');
-  const assets = getSelected('assets');
-  const price = PRICE_TABLE[type][quality][assets];
-
-  els.price.textContent = `${formatKR(price)} 만원`;
-
-  els.summary.innerHTML =
-    `<strong>${pretty.type[type]}</strong> · <strong>${pretty.quality[quality]}</strong> · <strong>${pretty.assets[assets]}</strong><br>
-     컷 1장 기준 금액입니다. 추가 컷/야경/복잡도에 따라 달라질 수 있음.`;
+/** n장의 가격: P + 0.5P*(n-1) */
+function priceWithQuantity(base, n){
+  n = Math.max(1, parseInt(n||1,10));
+  return base + 0.5 * base * (n - 1);
 }
 
-['type','quality','assets'].forEach(group=>{
-  document.querySelectorAll(`#${group} input`).forEach(i=> i.addEventListener('change', calc));
-});
-
-els.cta.addEventListener('click', ()=>{
-  const type = getSelected('type');
-  const quality = getSelected('quality');
-  const assets = getSelected('assets');
-  const p = PRICE_TABLE[type][quality][assets];
-  const msg = `[빠른 견적 문의]\n유형: ${pretty.type[type]}\n레벨: ${pretty.quality[quality]}\n자료: ${pretty.assets[assets]}\n예상가: ${p}만원\n\n프로젝트 개요를 보내주세요 :)`;
-  // 메신저/메일 붙여넣기 편하도록 클립보드 복사
-  navigator.clipboard.writeText(msg).then(()=>{
-    els.cta.textContent = "복사됨! 메신저에 붙여넣기";
-    setTimeout(()=> els.cta.textContent = "견적 문의하기", 1800);
+/** 현재 선택된 유형과 장수 수집 */
+function getSelectedTypes(){
+  const selected = [];
+  els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
+    const type = cb.dataset.type;
+    const qtyInput = document.querySelector(`input[data-qty="${type}"]`);
+    const qty = parseInt(qtyInput.value||"1",10);
+    if(cb.checked){ selected.push({type, qty}); }
   });
+  return selected.length ? selected : [{type:'interior', qty:1}]; // 최소 1개 보장
+}
+
+function calc(){
+  const q = getSelectedQuality();
+  const a = getSelectedAssets();
+  const selected = getSelectedTypes();
+
+  let total = 0;
+  els.breakdown.innerHTML = '';
+
+  selected.forEach(({type, qty})=>{
+    const base = PRICE_TABLE[type][q][a];
+    const subtotal = priceWithQuantity(base, qty);
+    total += subtotal;
+
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${PRETTY.type[type]}</strong> · ${qty}장 · 기본가 ${base} → 합계 ${formatKR(subtotal)} 만원`;
+    els.breakdown.appendChild(li);
+  });
+
+  els.price.textContent = `${formatKR(total)} 만원`;
+  // 상단 요약
+  const list = selected.map(s=> `${PRETTY.type[s.type]} ${s.qty}장`).join(', ');
+  els.summary.innerHTML = `${list} · <strong>${PRETTY.quality[q]}</strong> · <strong>${PRETTY.assets[a]}</strong>`;
+}
+
+/* 수량 증감 버튼 처리 + 체크박스 토글 시 수량 UI 표시 */
+function bindQtyUI(){
+  // 체크박스 토글 → qty show/hide
+  els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
+    const type = cb.dataset.type;
+    const box = document.querySelector(`#qty-${type}`);
+    function toggle(){ box.hidden = !cb.checked; calc(); }
+    cb.addEventListener('change', toggle);
+    toggle();
+  });
+
+  // + / - 버튼
+  els.types.querySelectorAll('.qty button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const type = btn.dataset.plus || btn.dataset.minus;
+      const input = document.querySelector(`input[data-qty="${type}"]`);
+      let v = parseInt(input.value||"1",10);
+      if(btn.dataset.plus) v++;
+      if(btn.dataset.minus) v = Math.max(1, v-1);
+      input.value = v;
+      calc();
+    });
+  });
+
+  // 숫자 직접 입력
+  els.types.querySelectorAll('.qty input[type="number"]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ if(inp.value===''||parseInt(inp.value,10)<1) inp.value=1; calc(); });
+    inp.addEventListener('blur', ()=>{ if(parseInt(inp.value,10)<1) inp.value=1; calc(); });
+  });
+}
+
+['quality','assets'].forEach(id=>{
+  document.querySelectorAll(`#${id} input`).forEach(i=> i.addEventListener('change', calc));
 });
 
-calc(); // 초기 표시
+function selectedMessage(total){
+  const q = PRETTY.quality[getSelectedQuality()];
+  const a = PRETTY.assets[getSelectedAssets()];
+  const typesText = getSelectedTypes().map(({type, qty})=> `${PRETTY.type[type]} ${qty}장`).join(', ');
+  return `[빠른 견적 문의]
+유형: ${typesText}
+레벨: ${q}
+자료: ${a}
+예상가: ${total}만원
+
+프로젝트 개요(용도/면적/요청컷/데드라인)를 보내주세요 :)`;
+}
+
+async function copyText(txt){
+  try{ await navigator.clipboard.writeText(txt); return true; }
+  catch(e){
+    const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly','');
+    ta.style.position='fixed'; ta.style.top='-1000px'; document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+    return ok;
+  }
+}
+
+els.cta.addEventListener('click', async ()=>{
+  const totalStr = document.getElementById('price').textContent.replace(' 만원','').replace(/,/g,'');
+  const total = parseInt(totalStr,10);
+  const ok = await copyText(selectedMessage(total));
+  els.cta.textContent = ok ? "복사됨! 메신저에 붙여넣기" : "복사 실패… 길게 눌러 복사";
+  setTimeout(()=> els.cta.textContent = "견적 문의하기", 1800);
+});
+
+bindQtyUI();
+calc();
 </script>
 </body>
 </html>
