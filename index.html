@@ -22,13 +22,19 @@
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:18px; position:relative; overflow:hidden;
   }
-  .span-4{grid-column:span 4} .span-8{grid-column:span 8} .span-12{grid-column:span 12}
-  @media (max-width:920px){ .span-8,.span-4{grid-column:span 12} }
+  /* ✅ 누락되었던 span-6 추가 */
+  .span-4{grid-column:span 4}
+  .span-6{grid-column:span 6} /* ← 추가 */
+  .span-8{grid-column:span 8}
+  .span-12{grid-column:span 12}
+  /* ✅ 반응형에서도 span-6 포함 */
+  @media (max-width:920px){ .span-8,.span-6,.span-4{grid-column:span 12} }
 
   .label{display:block; font-size:13px; color:var(--muted); margin-bottom:8px}
   .seg{display:flex; gap:10px; flex-wrap:wrap}
-  /* type: checkbox pill */
-  .pill-check{position:relative}
+
+  /* 체크박스(유형) */
+  .pill-check{position:relative; display:flex; align-items:center; gap:6px;} /* ← 라벨+수량 가로 정렬 */
   .pill-check input{display:none}
   .pill-check label{
     display:inline-flex; align-items:center; gap:10px;
@@ -41,15 +47,16 @@
     color:#020617; border-color:transparent; font-weight:700;
   }
   .qty{
-    width:78px; display:inline-flex; align-items:center; justify-content:space-between;
-    background:#0b1220; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:6px 8px; margin-left:6px;
+    width:84px; display:inline-flex; align-items:center; justify-content:space-between;
+    background:#0b1220; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:6px 8px;
   }
-  .qty input{width:36px; background:transparent; border:none; color:var(--fg); text-align:center; font-size:14px}
+  .qty input{width:38px; background:transparent; border:none; color:var(--fg); text-align:center; font-size:14px}
   .qty button{
     width:22px; height:22px; border-radius:6px; background:#0f1624; color:#cbd5e1; border:1px solid rgba(255,255,255,.08); cursor:pointer
   }
   .qty[hidden]{display:none!important}
 
+  /* 라디오(퀄리티/자료) */
   .seg input[type=radio]{display:none}
   .seg .radio{
     user-select:none; cursor:pointer; padding:10px 12px; border-radius:10px;
@@ -198,40 +205,18 @@
   </div>
 
 <script>
-/* ===============================
-   가격표 (단위: 만원)
-   열: both(도O·모O) / modelOnly(도X·모O) / none(도X·모X)
-   요청 반영: interior.high.none = 70
-   =============================== */
+/* 가격표 (만원) — interior.high.none = 70 유지 */
 const PRICE_TABLE = {
-  interior: { // 실내투시도
-    low:   { both: 10, modelOnly: 15, none: 20 },
-    mid:   { both: 20, modelOnly: 30, none: 40 },
-    high:  { both: 30, modelOnly: 50, none: 70 } // ← 수정됨
-  },
-  exterior: { // 실외투시도
-    low:   { both: 20, modelOnly: 25, none: 30 },
-    mid:   { both: 30, modelOnly: 40, none: 50 },
-    high:  { both: 50, modelOnly: 75, none: 100 }
-  },
-  bird: { // 조감도
-    low:   { both: 30, modelOnly: 50, none: 75 },
-    mid:   { both: 60, modelOnly: 80, none: 100 },
-    high:  { both: 100, modelOnly: 150, none: 200 }
-  },
-  area: { // 광역도
-    low:   { both: 60,  modelOnly: 80,  none: 100 },
-    mid:   { both: 100, modelOnly: 150, none: 200 },
-    high:  { both: 150, modelOnly: 200, none: 300 }
-  }
+  interior: { low:{both:10,modelOnly:15,none:20}, mid:{both:20,modelOnly:30,none:40}, high:{both:30,modelOnly:50,none:70} },
+  exterior: { low:{both:20,modelOnly:25,none:30}, mid:{both:30,modelOnly:40,none:50}, high:{both:50,modelOnly:75,none:100} },
+  bird:     { low:{both:30,modelOnly:50,none:75}, mid:{both:60,modelOnly:80,none:100}, high:{both:100,modelOnly:150,none:200} },
+  area:     { low:{both:60,modelOnly:80,none:100}, mid:{both:100,modelOnly:150,none:200}, high:{both:150,modelOnly:200,none:300} }
 };
-
 const PRETTY = {
   type:{ interior:"실내 투시", exterior:"실외 투시", bird:"조감", area:"광역" },
   quality:{ low:"베이식", mid:"프로", high:"엘리트" },
   assets:{ both:"도면·모델 모두 제공", modelOnly:"3D 모델만 제공", none:"자료 없음" }
 };
-
 const els = {
   types: document.querySelector('#types'),
   price: document.querySelector('#price'),
@@ -239,121 +224,58 @@ const els = {
   breakdown: document.querySelector('#breakdown'),
   cta: document.querySelector('#ctaBtn')
 };
-
 function getSelectedQuality(){ return document.querySelector('[name="quality"]:checked').value; }
 function getSelectedAssets(){ return document.querySelector('[name="assets"]:checked').value; }
 function formatKR(n){ return n.toLocaleString('ko-KR'); }
-
-/** n장의 가격: P + 0.5P*(n-1) */
-function priceWithQuantity(base, n){
-  n = Math.max(1, parseInt(n||1,10));
-  return base + 0.5 * base * (n - 1);
-}
-
-/** 현재 선택된 유형과 장수 수집 */
+/* n장의 가격: P + 0.5P*(n-1) */
+function priceWithQuantity(base, n){ n=Math.max(1,parseInt(n||1,10)); return base + 0.5*base*(n-1); }
 function getSelectedTypes(){
-  const selected = [];
-  els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
-    const type = cb.dataset.type;
-    const qtyInput = document.querySelector(`input[data-qty="${type}"]`);
-    const qty = parseInt(qtyInput.value||"1",10);
-    if(cb.checked){ selected.push({type, qty}); }
+  const selected=[]; els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
+    const type=cb.dataset.type; const qtyInput=document.querySelector(`input[data-qty="${type}"]`);
+    const qty=parseInt(qtyInput.value||"1",10); if(cb.checked){ selected.push({type,qty}); }
   });
-  return selected.length ? selected : [{type:'interior', qty:1}]; // 최소 1개 보장
+  return selected.length?selected:[{type:'interior',qty:1}];
 }
-
 function calc(){
-  const q = getSelectedQuality();
-  const a = getSelectedAssets();
-  const selected = getSelectedTypes();
-
-  let total = 0;
-  els.breakdown.innerHTML = '';
-
-  selected.forEach(({type, qty})=>{
-    const base = PRICE_TABLE[type][q][a];
-    const subtotal = priceWithQuantity(base, qty);
-    total += subtotal;
-
-    const li = document.createElement('li');
-    li.innerHTML = `<strong>${PRETTY.type[type]}</strong> · ${qty}장 · 기본가 ${base} → 합계 ${formatKR(subtotal)} 만원`;
+  const q=getSelectedQuality(), a=getSelectedAssets(), selected=getSelectedTypes();
+  let total=0; els.breakdown.innerHTML='';
+  selected.forEach(({type,qty})=>{
+    const base=PRICE_TABLE[type][q][a]; const subtotal=priceWithQuantity(base,qty); total+=subtotal;
+    const li=document.createElement('li'); li.innerHTML=`<strong>${PRETTY.type[type]}</strong> · ${qty}장 · 기본가 ${base} → 합계 ${formatKR(subtotal)} 만원`;
     els.breakdown.appendChild(li);
   });
-
-  els.price.textContent = `${formatKR(total)} 만원`;
-  // 상단 요약
-  const list = selected.map(s=> `${PRETTY.type[s.type]} ${s.qty}장`).join(', ');
+  els.price.textContent=`${formatKR(total)} 만원`;
+  const list=selected.map(s=>`${PRETTY.type[s.type]} ${s.qty}장`).join(', ');
   els.summary.innerHTML = `${list} · <strong>${PRETTY.quality[q]}</strong> · <strong>${PRETTY.assets[a]}</strong>`;
 }
-
-/* 수량 증감 버튼 처리 + 체크박스 토글 시 수량 UI 표시 */
 function bindQtyUI(){
-  // 체크박스 토글 → qty show/hide
   els.types.querySelectorAll('input[type="checkbox"][data-type]').forEach(cb=>{
-    const type = cb.dataset.type;
-    const box = document.querySelector(`#qty-${type}`);
-    function toggle(){ box.hidden = !cb.checked; calc(); }
-    cb.addEventListener('change', toggle);
-    toggle();
+    const type=cb.dataset.type; const box=document.querySelector(`#qty-${type}`);
+    function toggle(){ box.hidden=!cb.checked; calc(); }
+    cb.addEventListener('change', toggle); toggle();
   });
-
-  // + / - 버튼
   els.types.querySelectorAll('.qty button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const type = btn.dataset.plus || btn.dataset.minus;
-      const input = document.querySelector(`input[data-qty="${type}"]`);
-      let v = parseInt(input.value||"1",10);
-      if(btn.dataset.plus) v++;
-      if(btn.dataset.minus) v = Math.max(1, v-1);
-      input.value = v;
-      calc();
+      const type=btn.dataset.plus||btn.dataset.minus; const input=document.querySelector(`input[data-qty="${type}"]`);
+      let v=parseInt(input.value||"1",10); if(btn.dataset.plus) v++; if(btn.dataset.minus) v=Math.max(1,v-1); input.value=v; calc();
     });
   });
-
-  // 숫자 직접 입력
   els.types.querySelectorAll('.qty input[type="number"]').forEach(inp=>{
     inp.addEventListener('input', ()=>{ if(inp.value===''||parseInt(inp.value,10)<1) inp.value=1; calc(); });
     inp.addEventListener('blur', ()=>{ if(parseInt(inp.value,10)<1) inp.value=1; calc(); });
   });
 }
-
-['quality','assets'].forEach(id=>{
-  document.querySelectorAll(`#${id} input`).forEach(i=> i.addEventListener('change', calc));
-});
-
-function selectedMessage(total){
-  const q = PRETTY.quality[getSelectedQuality()];
-  const a = PRETTY.assets[getSelectedAssets()];
-  const typesText = getSelectedTypes().map(({type, qty})=> `${PRETTY.type[type]} ${qty}장`).join(', ');
-  return `[빠른 견적 문의]
+['quality','assets'].forEach(id=>{ document.querySelectorAll(`#${id} input`).forEach(i=> i.addEventListener('change', calc)); });
+async function copyText(txt){ try{ await navigator.clipboard.writeText(txt); return true; }catch(e){ const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-1000px'; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} document.body.removeChild(ta); return ok; } }
+function selectedMessage(total){ const q=PRETTY.quality[getSelectedQuality()], a=PRETTY.assets[getSelectedAssets()], typesText=getSelectedTypes().map(({type,qty})=>`${PRETTY.type[type]} ${qty}장`).join(', '); return `[빠른 견적 문의]
 유형: ${typesText}
 레벨: ${q}
 자료: ${a}
 예상가: ${total}만원
 
-프로젝트 개요(용도/면적/요청컷/데드라인)를 보내주세요 :)`;
-}
-
-async function copyText(txt){
-  try{ await navigator.clipboard.writeText(txt); return true; }
-  catch(e){
-    const ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly','');
-    ta.style.position='fixed'; ta.style.top='-1000px'; document.body.appendChild(ta); ta.select();
-    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
-    return ok;
-  }
-}
-
-els.cta.addEventListener('click', async ()=>{
-  const totalStr = document.getElementById('price').textContent.replace(' 만원','').replace(/,/g,'');
-  const total = parseInt(totalStr,10);
-  const ok = await copyText(selectedMessage(total));
-  els.cta.textContent = ok ? "복사됨! 메신저에 붙여넣기" : "복사 실패… 길게 눌러 복사";
-  setTimeout(()=> els.cta.textContent = "견적 문의하기", 1800);
-});
-
-bindQtyUI();
-calc();
+프로젝트 개요(용도/면적/요청컷/데드라인)를 보내주세요 :)`; }
+els.cta.addEventListener('click', async ()=>{ const totalStr=document.getElementById('price').textContent.replace(' 만원','').replace(/,/g,''); const total=parseInt(totalStr,10); const ok=await copyText(selectedMessage(total)); els.cta.textContent= ok? "복사됨! 메신저에 붙여넣기":"복사 실패… 길게 눌러 복사"; setTimeout(()=> els.cta.textContent="견적 문의하기",1800); });
+bindQtyUI(); calc();
 </script>
 </body>
 </html>
